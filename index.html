@@ -4,451 +4,481 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CAO Medicine Points Pressure Model — 2026</title>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #060b16; color: #e2e8f0; font-family: 'Courier New', monospace; font-size: 12px; }
-    input[type=range] { accent-color: #3b82f6; cursor: pointer; }
+    input[type=range] { accent-color: #3b82f6; cursor: pointer; width: 120px; }
     button { cursor: pointer; font-family: inherit; }
-    table { border-collapse: collapse; }
+    .hdr { background: #0a1320; border-bottom: 1px solid #162035; padding: 20px 24px 12px; }
+    .title { font-size: 20px; font-weight: 700; color: #fff; }
+    .sub { font-size: 10px; color: #374151; margin-top: 2px; }
+    .tag { font-size: 9px; letter-spacing: 3px; color: #3b82f6; margin-bottom: 4px; }
+    .ctrl-row { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid #162035; margin-top: 14px; }
+    .tabs { display: flex; margin-top: 10px; }
+    .tab-btn { background: transparent; border: none; border-bottom: 2px solid transparent; color: #4b5563; padding: 7px 16px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
+    .tab-btn.active { border-bottom-color: #3b82f6; color: #3b82f6; }
+    .content { padding: 20px 24px; }
+    .grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 12px; }
+    .kpi { background: #0a1020; border: 1px solid #162035; border-radius: 8px; padding: 14px; }
+    .kpi-label { font-size: 8px; letter-spacing: 2px; color: #4b5563; margin-bottom: 4px; }
+    .kpi-val { font-size: 22px; font-weight: 700; }
+    .kpi-sub { font-size: 9px; color: #374151; margin-top: 3px; }
+    .card { background: #0a1020; border: 1px solid #162035; border-radius: 8px; padding: 18px; margin-bottom: 12px; }
+    .sec { font-size: 8px; letter-spacing: 3px; color: #3b82f6; margin-bottom: 12px; }
+    .sc-card { background: #0a1020; border-radius: 8px; padding: 18px; margin-bottom: 12px; }
+    .stat-mini { padding: 7px 8px; background: #060b16; border-radius: 4px; }
+    .stat-mini-label { font-size: 7px; color: #4b5563; letter-spacing: 1px; margin-bottom: 2px; }
+    .stat-mini-val { font-size: 14px; font-weight: 700; color: #fff; }
+    .mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .p-box { border-radius: 6px; text-align: center; padding: 12px; }
+    .p-label { font-size: 8px; letter-spacing: 2px; margin-bottom: 2px; }
+    .p-big { font-size: 34px; font-weight: 700; }
+    .p-note { font-size: 9px; color: #4b5563; margin-top: 2px; }
+    .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .bar-label { font-size: 10px; color: #94a3b8; min-width: 100px; }
+    .bar-track { flex: 1; background: #162035; border-radius: 3px; height: 7px; }
+    .bar-fill { height: 100%; border-radius: 3px; }
+    .bar-val { font-size: 12px; font-weight: 700; min-width: 36px; }
+    .verdict-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #0d1829; font-size: 10px; }
+    .mbox { padding: 10px; background: #060b16; border-radius: 6px; border: 1px solid #162035; margin-top: 10px; }
+    .mbox-label { font-size: 8px; color: #4b5563; letter-spacing: 2px; margin-bottom: 4px; }
+    .mbox-txt { font-size: 10px; color: #6b7280; }
+    .tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .tbl th { text-align: left; padding: 6px 8px; color: #3b82f6; font-size: 8px; letter-spacing: 1px; border-bottom: 1px solid #162035; font-weight: 400; }
+    .tbl td { padding: 5px 8px; border-bottom: 1px solid #0d1829; }
+    .scenario-item { margin-bottom: 10px; padding: 10px; cursor: pointer; border-radius: 4px; border: 1px solid #162035; }
+    .meta-row { display: flex; gap: 12px; margin-bottom: 8px; }
+    .meta-k { min-width: 130px; font-size: 10px; font-weight: 700; color: #f59e0b; }
+    .meta-v { font-size: 10px; color: #6b7280; line-height: 1.6; }
+    .ol-card { padding: 12px; border-radius: 6px; }
+    .ol-row { display: flex; justify-content: space-between; font-size: 10px; padding: 2px 0; border-bottom: 1px solid #0d1829; }
+    .hdr-sc { display: flex; gap: 10px; }
+    .hdr-sc-box { padding: 8px 14px; text-align: center; cursor: pointer; border-radius: 8px; }
+    .stat-row { display: flex; gap: 20px; margin-left: auto; }
+    .stat-item { text-align: right; }
+    .stat-lbl { font-size: 8px; letter-spacing: 2px; color: #4b5563; }
+    .stat-val { font-size: 17px; font-weight: 700; }
+    .ul-btns { display: flex; gap: 6px; }
+    .ul-btn { padding: 3px 9px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+    @media(max-width:600px){.grid4{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.stat-row{display:none}}
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script>
-    const { useState } = React;
-    const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-            ReferenceLine, BarChart, Bar } = Recharts;
+<div id="app"></div>
+<script>
+const HISTORY = [
+  {year:2017,ucd:730,tcd:728,rcsi:725,ucc:722,nuig:718,avg:724.6,app:2100},
+  {year:2018,ucd:732,tcd:730,rcsi:727,ucc:724,nuig:720,avg:726.6,app:2180},
+  {year:2019,ucd:735,tcd:732,rcsi:729,ucc:729,nuig:726,avg:730.2,app:2280},
+  {year:2020,ucd:737,tcd:735,rcsi:733,ucc:731,nuig:728,avg:732.8,app:2340},
+  {year:2021,ucd:755,tcd:752,rcsi:749,ucc:747,nuig:742,avg:749.0,app:2850,note:'COVID grades'},
+  {year:2022,ucd:743,tcd:743,rcsi:740,ucc:738,nuig:735,avg:739.8,app:2500},
+  {year:2023,ucd:741,tcd:740,rcsi:737,ucc:735,nuig:732,avg:737.0,app:2460,note:'+60 places'},
+  {year:2024,ucd:739,tcd:737,rcsi:733,ucc:731,nuig:729,avg:733.8,app:2440},
+  {year:2025,ucd:737,tcd:735,rcsi:733,ucc:730,nuig:728,avg:732.6,app:2420},
+];
+const TOTAL=483,LRM=733,CUR=732.6,CDEV=CUR-LRM;
+const UL=[
+  {label:'Conservative',sub:'30 places',places:30,color:'#f59e0b'},
+  {label:'Base Case',sub:'50 places',places:50,color:'#3b82f6'},
+  {label:'Aggressive',sub:'75 places',places:75,color:'#ef4444'},
+];
 
-    const HISTORY = [
-      { year:2017, ucd:730, tcd:728, rcsi:725, ucc:722, nuig:718, avg:724.6, applicants:2100 },
-      { year:2018, ucd:732, tcd:730, rcsi:727, ucc:724, nuig:720, avg:726.6, applicants:2180 },
-      { year:2019, ucd:735, tcd:732, rcsi:729, ucc:729, nuig:726, avg:730.2, applicants:2280 },
-      { year:2020, ucd:737, tcd:735, rcsi:733, ucc:731, nuig:728, avg:732.8, applicants:2340 },
-      { year:2021, ucd:755, tcd:752, rcsi:749, ucc:747, nuig:742, avg:749.0, applicants:2850, note:'COVID grades' },
-      { year:2022, ucd:743, tcd:743, rcsi:740, ucc:738, nuig:735, avg:739.8, applicants:2500 },
-      { year:2023, ucd:741, tcd:740, rcsi:737, ucc:735, nuig:732, avg:737.0, applicants:2460, note:'+60 places' },
-      { year:2024, ucd:739, tcd:737, rcsi:733, ucc:731, nuig:729, avg:733.8, applicants:2440 },
-      { year:2025, ucd:737, tcd:735, rcsi:733, ucc:730, nuig:728, avg:732.6, applicants:2420 },
-    ];
+function sig(x){return 1/(1+Math.exp(-8*x));}
+function calc(d,u){
+  const relief=u/TOTAL,net=d-relief,raw=net*100*1.8,mr=raw-0.35*CDEV;
+  return {relief,net,raw,mr,proj:+(CUR+mr).toFixed(1),p:sig(net)};
+}
 
-    const TOTAL_PLACES = 483;
-    const LR_MEAN = 733;
-    const CUR_PTS = 732.6;
-    const CUR_DEV = CUR_PTS - LR_MEAN;
+let state={d:0.20,ui:1,tab:'overview'};
 
-    const UL = [
-      { label:'Conservative', sub:'30 places', places:30, color:'#f59e0b' },
-      { label:'Base Case',    sub:'50 places', places:50, color:'#3b82f6' },
-      { label:'Aggressive',  sub:'75 places', places:75, color:'#ef4444' },
-    ];
+function render(){
+  const {d,ui,tab}=state;
+  const sc=UL.map(s=>({...s,...calc(d,s.places)}));
+  const act=sc[ui];
+  const newApp=Math.round(2420*(1+d));
+  const newTot=TOTAL+UL[ui].places;
 
-    function sig(x) { return 1 / (1 + Math.exp(-8 * x)); }
+  let html=`
+  <div class="hdr">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+      <div>
+        <div class="tag">LC MEDICINE ADMISSIONS · IRELAND</div>
+        <div class="title">CAO Points Pressure Model — 2026</div>
+        <div class="sub">Demand shock + UL supply offset + Ornstein-Uhlenbeck mean reversion</div>
+      </div>
+      <div class="hdr-sc">
+        ${sc.map((s,i)=>`
+          <div class="hdr-sc-box" onclick="setState({ui:${i}})"
+            style="background:${i===ui?s.color+'18':'transparent'};border:1px solid ${i===ui?s.color:'#1e3a5f'}">
+            <div style="font-size:8px;letter-spacing:2px;color:${s.color};margin-bottom:2px">${s.label.toUpperCase()}</div>
+            <div style="font-size:22px;font-weight:700;color:${s.p>0.55?'#ef4444':'#10b981'}">${Math.round(s.p*100)}%</div>
+            <div style="font-size:8px;color:#4b5563">P(rise)</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <div>
+        <div class="tag">DEMAND INCREASE</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="range" min="0" max="0.5" step="0.01" value="${d}" oninput="setState({d:+this.value})">
+          <span style="font-weight:700;color:#fff;font-size:15px">+${Math.round(d*100)}%</span>
+        </div>
+      </div>
+      <div>
+        <div class="tag">UL CAPACITY</div>
+        <div class="ul-btns">
+          ${UL.map((s,i)=>`
+            <button class="ul-btn" onclick="setState({ui:${i}})"
+              style="background:${ui===i?s.color:'transparent'};border:1px solid ${s.color};color:${ui===i?'#000':s.color}">
+              ${s.sub}
+            </button>`).join('')}
+        </div>
+      </div>
+      <div class="stat-row">
+        ${[['NET PRESSURE',(act.net*100).toFixed(1)+'%',act.net>0?'#ef4444':'#10b981'],
+           ['PROJECTED AVG',act.proj.toFixed(1),'#fff'],
+           ['Δ POINTS (MR)',(act.mr>=0?'+':'')+act.mr.toFixed(1),act.mr>0?'#ef4444':'#10b981'],
+           ['S/D RATIO',(newApp/newTot).toFixed(2)+'x','#f59e0b']
+          ].map(([l,v,c])=>`
+          <div class="stat-item">
+            <div class="stat-lbl">${l}</div>
+            <div class="stat-val" style="color:${c}">${v}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="tabs">
+      ${['overview','historical','scenarios','likelihood'].map(t=>`
+        <button class="tab-btn ${tab===t?'active':''}" onclick="setState({tab:'${t}'})">${t}</button>`).join('')}
+    </div>
+  </div>
+  <div class="content">`;
 
-    function calc(demandInc, ulPlaces) {
-      const relief = ulPlaces / TOTAL_PLACES;
-      const net = demandInc - relief;
-      const raw = net * 100 * 1.8;
-      const mr = raw - 0.35 * CUR_DEV;
-      return { relief, net, raw, mr, proj: +(CUR_PTS + mr).toFixed(1), p: sig(net) };
-    }
+  if(tab==='overview'){
+    html+=`
+    <div class="grid4">
+      ${[['2025 Avg Points','732.6','5-school combined','#3b82f6'],
+         ['Projected Applicants',newApp.toLocaleString(),'+'+(newApp-2420)+' vs 2025','#f59e0b'],
+         ['Total Places After UL',newTot,UL[ui].label+': '+UL[ui].places+' added','#10b981'],
+         ['MR-Adjusted Δ Points',(act.mr>=0?'+':'')+act.mr.toFixed(1),'After OU adjustment',act.mr>0?'#ef4444':'#10b981'],
+        ].map(([l,v,s,c])=>`
+        <div class="kpi" style="border-top:3px solid ${c}">
+          <div class="kpi-label">${l}</div>
+          <div class="kpi-val" style="color:${c}">${v}</div>
+          <div class="kpi-sub">${s}</div>
+        </div>`).join('')}
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="sec">COMBINED LC+HPAT POINTS BY INSTITUTION (2017–2025)</div>
+        <canvas id="lineChart" height="200"></canvas>
+        <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
+          ${[['UCD','#4a9eff'],['TCD','#f59e0b'],['RCSI','#ef4444'],['UCC','#10b981'],['NUIG','#a78bfa'],['Avg','#fff']].map(([l,c])=>`
+            <div style="display:flex;align-items:center;gap:4px">
+              <div style="width:12px;height:2px;background:${c}"></div>
+              <span style="font-size:9px;color:#4b5563">${l}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="sec">2026 SCENARIO PROJECTIONS</div>
+        ${sc.map((s,i)=>`
+          <div class="scenario-item" onclick="setState({ui:${i}})"
+            style="border-left:3px solid ${s.color};border-color:${i===ui?s.color:'#162035'};background:${i===ui?s.color+'0d':'transparent'}">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:10px;font-weight:700;color:${s.color}">${s.label} (${s.sub})</span>
+              <span style="font-size:10px;font-weight:700;color:${s.p>0.5?'#ef4444':'#10b981'}">P=${Math.round(s.p*100)}%</span>
+            </div>
+            <div style="display:flex;gap:14px">
+              ${[['Proj',s.proj.toFixed(1)],['Δ',(s.mr>=0?'+':'')+s.mr.toFixed(1)],['Net',(s.net*100).toFixed(1)+'%']].map(([l,v])=>`
+                <div>
+                  <div style="font-size:7px;color:#4b5563">${l}</div>
+                  <div style="font-size:13px;font-weight:700;color:#fff">${v}</div>
+                </div>`).join('')}
+            </div>
+          </div>`).join('')}
+        <div class="mbox">
+          <div class="mbox-label">OU MEAN REVERSION</div>
+          <div class="mbox-txt">Dev from LR mean: <span style="color:${CDEV<0?'#10b981':'#ef4444'}">${CDEV.toFixed(1)} pts</span> · θ=0.35 · Adj: <span style="color:#f59e0b">${(-0.35*CDEV).toFixed(1)} pts</span></div>
+        </div>
+      </div>
+    </div>`;
+  }
 
-    const TT = (props) => React.createElement(Tooltip, {
-      ...props,
-      contentStyle: { background:'#0a1020', border:'1px solid #162035', borderRadius:'6px', fontSize:11 }
-    });
+  if(tab==='historical'){
+    html+=`
+    <div class="grid2">
+      <div class="card">
+        <div class="sec">HPAT APPLICANT DEMAND (2017–2026 PROJ.)</div>
+        <canvas id="demChart" height="180"></canvas>
+      </div>
+      <div class="card">
+        <div class="sec">YOY POINTS CHANGE — 5-SCHOOL AVERAGE</div>
+        <canvas id="deltaChart" height="180"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sec">RAW DATA — MINIMUM COMBINED POINTS BY INSTITUTION</div>
+      <div style="overflow-x:auto">
+        <table class="tbl">
+          <thead><tr>${['Year','UCD','TCD','RCSI','UCC','NUIG','Avg','YoY Δ','Notes'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+          <tbody>
+            ${HISTORY.map((h,i)=>{
+              const delta=i>0?h.avg-HISTORY[i-1].avg:null;
+              const dc=delta===null?'#4b5563':delta>0?'#ef4444':'#10b981';
+              return `<tr style="background:${h.note?'rgba(13,22,13,0.5)':'transparent'}">
+                <td style="font-weight:700;color:#fff">${h.year}</td>
+                ${[h.ucd,h.tcd,h.rcsi,h.ucc,h.nuig].map(v=>`<td style="color:#94a3b8">${v}</td>`).join('')}
+                <td style="color:#f59e0b;font-weight:700">${h.avg}</td>
+                <td style="font-weight:700;color:${dc}">${delta===null?'—':(delta>0?'+':'')+delta.toFixed(1)}</td>
+                <td style="color:#374151;font-style:italic">${h.note||''}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  }
 
-    function App() {
-      const [d, setD] = useState(0.20);
-      const [ui, setUi] = useState(1);
-      const [tab, setTab] = useState('overview');
+  if(tab==='scenarios'){
+    html+=`
+    <div class="grid3">
+      ${sc.map((s,i)=>`
+        <div class="sc-card" style="border:1px solid ${s.color}">
+          <div style="font-size:9px;letter-spacing:3px;color:${s.color};margin-bottom:12px">${s.label.toUpperCase()} — ${s.sub}</div>
+          <div class="mini-grid">
+            ${[['UL Places',s.places],['Total Supply',TOTAL+s.places],
+               ['Supply Relief',(s.relief*100).toFixed(1)+'%'],['Net Pressure',(s.net*100).toFixed(1)+'%'],
+               ['Raw Δ Pts',(s.raw>=0?'+':'')+s.raw.toFixed(1)],['MR Adj',(-0.35*CDEV).toFixed(1)],
+               ['Final Δ',(s.mr>=0?'+':'')+s.mr.toFixed(1)],['Projected',s.proj.toFixed(1)]
+              ].map(([l,v])=>`
+              <div class="stat-mini">
+                <div class="stat-mini-label">${l}</div>
+                <div class="stat-mini-val">${v}</div>
+              </div>`).join('')}
+          </div>
+          <div class="p-box" style="background:${s.color}12">
+            <div class="p-label" style="color:${s.color}">P(POINTS RISE)</div>
+            <div class="p-big" style="color:${s.color}">${Math.round(s.p*100)}%</div>
+            <div class="p-note">${s.p>0.65?'▲ Rise likely':s.p>0.45?'→ Marginal':'▼ Fall possible'}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="sec">METHODOLOGY</div>
+      ${[['Demand Model','+'+Math.round(d*100)+'% applied to 2025 baseline 2,420 HPAT applicants → '+newApp.toLocaleString()+' projected'],
+         ['Supply Relief','UL places as % of current national total (483). Linear offset applied to demand pressure.'],
+         ['Points Sensitivity','~1.8 combined pts per 1% net pressure. Calibrated from 2017–2020 + 2022–2025 regression. COVID 2021 excluded.'],
+         ['Mean Reversion (OU)','θ=0.35. Current deviation from LR mean (733): '+CDEV.toFixed(1)+' pts. Adj: '+(-0.35*CDEV).toFixed(1)+' pts.'],
+         ['Likelihood Ratio','Logistic sigmoid P(rise)=1/(1+e^(−8×net)). Scale k=8 calibrated to 710–755 range.'],
+         ['COVID 2021','+16pt spike from accredited grades. Structural outlier — excluded from regression.'],
+        ].map(([k,v])=>`
+        <div class="meta-row"><div class="meta-k">${k}</div><div class="meta-v">${v}</div></div>`).join('')}
+    </div>`;
+  }
 
-      const sc = UL.map(s => ({ ...s, ...calc(d, s.places) }));
-      const act = sc[ui];
-      const newApp = Math.round(2420 * (1 + d));
-      const newTot = TOTAL_PLACES + UL[ui].places;
+  if(tab==='likelihood'){
+    const maxRatio=Math.max(2420/TOTAL,...sc.map(s=>newApp/(TOTAL+s.places)));
+    html+=`
+    <div class="grid2">
+      <div class="card">
+        <div class="sec">P(RISE) vs P(STABLE/FALL) BY SCENARIO</div>
+        <canvas id="likeChart" height="180"></canvas>
+      </div>
+      <div class="card">
+        <div class="sec">SUPPLY/DEMAND COMPRESSION RATIO</div>
+        <div style="font-size:10px;color:#4b5563;margin-bottom:10px">Applicants per available place</div>
+        ${[{label:'2025 Baseline',r:2420/TOTAL,c:'#4b5563'},...sc.map(s=>({label:s.label,r:newApp/(TOTAL+s.places),c:s.color}))].map(item=>`
+          <div class="bar-row">
+            <span class="bar-label">${item.label}</span>
+            <div class="bar-track"><div class="bar-fill" style="width:${Math.round(item.r/maxRatio*100)}%;background:${item.c}"></div></div>
+            <span class="bar-val" style="color:${item.c}">${item.r.toFixed(2)}x</span>
+          </div>`).join('')}
+        <div class="mbox">
+          <div class="mbox-label">VERDICT MATRIX</div>
+          ${sc.map(s=>`
+            <div class="verdict-row">
+              <span style="color:${s.color}">${s.label}</span>
+              <span style="font-weight:700;color:${s.mr>1?'#ef4444':s.mr>-1?'#f59e0b':'#10b981'}">
+                ${s.mr>1?'▲ RISE LIKELY':s.mr>-1?'→ FLAT / MARGINAL':'▼ FALL POSSIBLE'}
+              </span>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sec">OUTLIER ANALYSIS — BOUNDARY CONDITIONS</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        ${[{label:'Bull',desc:'+30% / 30 pl',d2:0.30,u2:30,c:'#ef4444'},
+           {label:'Base',desc:'+20% / 50 pl',d2:0.20,u2:50,c:'#3b82f6'},
+           {label:'Bear',desc:'+10% / 75 pl',d2:0.10,u2:75,c:'#10b981'},
+           {label:'Outlier',desc:'+40% / 30 pl',d2:0.40,u2:30,c:'#a78bfa'},
+          ].map(o=>{
+            const m=calc(o.d2,o.u2);
+            return `<div class="ol-card" style="border:1px solid ${o.c};background:${o.c}07">
+              <div style="font-weight:700;color:${o.c};font-size:11px;margin-bottom:2px">${o.label}</div>
+              <div style="font-size:9px;color:#4b5563;margin-bottom:8px">${o.desc}</div>
+              ${[['Net Pressure',(m.net*100).toFixed(1)+'%'],
+                 ['Raw Δ Pts',(m.raw>=0?'+':'')+m.raw.toFixed(1)],
+                 ['MR Δ Pts',(m.mr>=0?'+':'')+m.mr.toFixed(1)],
+                 ['Projected',m.proj.toFixed(1)],
+                 ['P(Rise)',Math.round(m.p*100)+'%'],
+                ].map(([l,v])=>`
+                <div class="ol-row">
+                  <span style="color:#4b5563">${l}</span>
+                  <span style="color:#fff;font-weight:700">${v}</span>
+                </div>`).join('')}
+            </div>`;
+          }).join('')}
+      </div>
+    </div>`;
+  }
 
-      const demChart = [
-        ...HISTORY.map(h => ({ year: h.year, v: h.applicants })),
-        { year: 2026, v: newApp },
-      ];
-      const deltaChart = HISTORY.slice(1).map((h, i) => ({
-        year: h.year,
-        delta: +(h.avg - HISTORY[i].avg).toFixed(1),
-      }));
+  html+='</div>';
+  document.getElementById('app').innerHTML=html;
 
-      const card = (children, extra) =>
-        React.createElement('div', {
-          style: { background:'#0a1020', border:'1px solid #162035', borderRadius:8,
-                   padding:18, ...extra }
-        }, children);
+  // Draw charts
+  if(tab==='overview') drawLineChart(d);
+  if(tab==='historical') { drawDemChart(newApp); drawDeltaChart(); }
+  if(tab==='likelihood') drawLikeChart(sc);
+}
 
-      const secLabel = (txt) =>
-        React.createElement('div', {
-          style: { fontSize:8, letterSpacing:3, color:'#3b82f6', marginBottom:12 }
-        }, txt);
+function drawLineChart(d){
+  const sc=UL.map(s=>({...s,...calc(d,s.places)}));
+  const c=document.getElementById('lineChart');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  const W=c.offsetWidth||c.parentElement.offsetWidth;
+  c.width=W; c.height=200;
+  const pad={t:10,r:10,b:30,l:40};
+  const iw=W-pad.l-pad.r,ih=200-pad.t-pad.b;
+  const years=HISTORY.map(h=>h.year);
+  const minY=710,maxY=760;
+  const xS=i=>pad.l+i/(years.length-1)*iw;
+  const yS=v=>pad.t+(1-(v-minY)/(maxY-minY))*ih;
 
-      return React.createElement('div', { style:{ minHeight:'100vh' } },
+  ctx.clearRect(0,0,W,200);
+  ctx.strokeStyle='#162035'; ctx.lineWidth=0.5;
+  [720,730,740,750].forEach(v=>{
+    ctx.beginPath();ctx.moveTo(pad.l,yS(v));ctx.lineTo(pad.l+iw,yS(v));ctx.stroke();
+  });
 
-        /* ── HEADER ── */
-        React.createElement('div', { style:{ background:'#0a1320', borderBottom:'1px solid #162035', padding:'20px 24px 0' } },
-          React.createElement('div', { style:{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:10, marginBottom:16 } },
-            React.createElement('div', null,
-              React.createElement('div', { style:{ fontSize:9, letterSpacing:4, color:'#3b82f6', marginBottom:4 } }, 'LC MEDICINE ADMISSIONS · IRELAND'),
-              React.createElement('div', { style:{ fontSize:20, fontWeight:700, color:'#fff' } }, 'CAO Points Pressure Model — 2026'),
-              React.createElement('div', { style:{ fontSize:10, color:'#374151', marginTop:2 } }, 'Demand shock + UL supply offset + Ornstein-Uhlenbeck mean reversion'),
-            ),
-            React.createElement('div', { style:{ display:'flex', gap:10 } },
-              sc.map((s, i) =>
-                React.createElement('div', {
-                  key:i, onClick:() => setUi(i),
-                  style:{ padding:'8px 14px', textAlign:'center', cursor:'pointer',
-                          background: i===ui ? s.color+'18' : 'transparent',
-                          border:`1px solid ${i===ui ? s.color : '#1e3a5f'}`, borderRadius:8 }
-                },
-                  React.createElement('div', { style:{ fontSize:8, letterSpacing:2, color:s.color, marginBottom:2 } }, s.label.toUpperCase()),
-                  React.createElement('div', { style:{ fontSize:22, fontWeight:700, color: s.p>0.55?'#ef4444':'#10b981' } }, Math.round(s.p*100)+'%'),
-                  React.createElement('div', { style:{ fontSize:8, color:'#4b5563' } }, 'P(rise)'),
-                )
-              )
-            ),
-          ),
+  // LR mean
+  ctx.strokeStyle='#3b82f6'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(pad.l,yS(733));ctx.lineTo(pad.l+iw,yS(733));ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#3b82f6'; ctx.font='9px monospace';
+  ctx.fillText('LR 733',pad.l+iw-40,yS(733)-4);
 
-          /* Controls */
-          React.createElement('div', { style:{ display:'flex', alignItems:'center', gap:24, flexWrap:'wrap', padding:'10px 0', borderTop:'1px solid #162035' } },
-            React.createElement('div', null,
-              React.createElement('div', { style:{ fontSize:8, letterSpacing:3, color:'#3b82f6', marginBottom:4 } }, 'DEMAND INCREASE'),
-              React.createElement('div', { style:{ display:'flex', alignItems:'center', gap:8 } },
-                React.createElement('input', { type:'range', min:0, max:0.5, step:0.01, value:d, onChange: e => setD(+e.target.value), style:{ width:110 } }),
-                React.createElement('span', { style:{ fontWeight:700, color:'#fff', fontSize:15 } }, '+'+Math.round(d*100)+'%'),
-              ),
-            ),
-            React.createElement('div', null,
-              React.createElement('div', { style:{ fontSize:8, letterSpacing:3, color:'#3b82f6', marginBottom:4 } }, 'UL CAPACITY'),
-              React.createElement('div', { style:{ display:'flex', gap:6 } },
-                UL.map((s, i) =>
-                  React.createElement('button', {
-                    key:i, onClick:() => setUi(i),
-                    style:{ padding:'3px 9px', background: ui===i ? s.color : 'transparent',
-                            border:`1px solid ${s.color}`, borderRadius:4,
-                            color: ui===i ? '#000' : s.color, fontSize:10, fontWeight:700 }
-                  }, s.sub)
-                )
-              ),
-            ),
-            React.createElement('div', { style:{ marginLeft:'auto', display:'flex', gap:20 } },
-              [
-                ['NET PRESSURE', (act.net*100).toFixed(1)+'%', act.net>0?'#ef4444':'#10b981'],
-                ['PROJECTED AVG', act.proj.toFixed(1), '#fff'],
-                ['Δ POINTS (MR)', (act.mr>=0?'+':'')+act.mr.toFixed(1), act.mr>0?'#ef4444':'#10b981'],
-                ['S/D RATIO', (newApp/newTot).toFixed(2)+'x', '#f59e0b'],
-              ].map(([l,v,c]) =>
-                React.createElement('div', { key:l, style:{ textAlign:'right' } },
-                  React.createElement('div', { style:{ fontSize:8, letterSpacing:2, color:'#4b5563' } }, l),
-                  React.createElement('div', { style:{ fontSize:17, fontWeight:700, color:c } }, v),
-                )
-              )
-            ),
-          ),
+  const series=[['ucd','#4a9eff'],['tcd','#f59e0b'],['rcsi','#ef4444'],['ucc','#10b981'],['nuig','#a78bfa']];
+  series.forEach(([k,col])=>{
+    ctx.strokeStyle=col; ctx.lineWidth=1.2;
+    ctx.beginPath();
+    HISTORY.forEach((h,i)=>{ i===0?ctx.moveTo(xS(i),yS(h[k])):ctx.lineTo(xS(i),yS(h[k])); });
+    ctx.stroke();
+  });
 
-          /* Tabs */
-          React.createElement('div', { style:{ display:'flex' } },
-            ['overview','historical','scenarios','likelihood'].map(t =>
-              React.createElement('button', {
-                key:t, onClick:() => setTab(t),
-                style:{ background:'transparent', border:'none',
-                        borderBottom: tab===t ? '2px solid #3b82f6' : '2px solid transparent',
-                        color: tab===t ? '#3b82f6' : '#4b5563',
-                        padding:'7px 16px', fontSize:10, letterSpacing:2, textTransform:'uppercase' }
-              }, t)
-            )
-          ),
-        ),
+  ctx.strokeStyle='#fff'; ctx.lineWidth=2.5;
+  ctx.beginPath();
+  HISTORY.forEach((h,i)=>{ i===0?ctx.moveTo(xS(i),yS(h.avg)):ctx.lineTo(xS(i),yS(h.avg)); });
+  ctx.stroke();
+  HISTORY.forEach((h,i)=>{ ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(xS(i),yS(h.avg),3,0,Math.PI*2);ctx.fill(); });
 
-        /* ── CONTENT ── */
-        React.createElement('div', { style:{ padding:'20px 24px' } },
+  ctx.fillStyle='#4b5563'; ctx.font='9px monospace'; ctx.textAlign='center';
+  years.forEach((y,i)=>ctx.fillText(y,xS(i),200-pad.b+14));
+  ctx.textAlign='right';
+  [720,730,740,750].forEach(v=>ctx.fillText(v,pad.l-4,yS(v)+3));
+}
 
-          /* OVERVIEW */
-          tab === 'overview' && React.createElement('div', null,
-            React.createElement('div', { style:{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12, marginBottom:16 } },
-              [
-                ['2025 Avg Points','732.6','5-school combined','#3b82f6'],
-                ['Projected Applicants', newApp.toLocaleString(), '+'+(newApp-2420)+' vs 2025','#f59e0b'],
-                ['Total Places After UL', newTot, UL[ui].label+': '+UL[ui].places+' added','#10b981'],
-                ['MR-Adjusted Δ Points', (act.mr>=0?'+':'')+act.mr.toFixed(1), 'After OU adjustment', act.mr>0?'#ef4444':'#10b981'],
-              ].map(([l,v,s,c]) =>
-                React.createElement('div', { key:l, style:{ background:'#0a1020', border:'1px solid #162035', borderTop:'3px solid '+c, borderRadius:8, padding:14 } },
-                  React.createElement('div', { style:{ fontSize:8, letterSpacing:2, color:'#4b5563', marginBottom:4 } }, l),
-                  React.createElement('div', { style:{ fontSize:22, fontWeight:700, color:c } }, v),
-                  React.createElement('div', { style:{ fontSize:9, color:'#374151', marginTop:3 } }, s),
-                )
-              )
-            ),
-            React.createElement('div', { style:{ display:'grid', gridTemplateColumns:'1.6fr 1fr', gap:12 } },
-              card(
-                [
-                  secLabel('COMBINED LC+HPAT POINTS BY INSTITUTION (2017–2025)'),
-                  React.createElement(ResponsiveContainer, { width:'100%', height:220 },
-                    React.createElement(LineChart, { data:HISTORY },
-                      React.createElement(CartesianGrid, { strokeDasharray:'3 3', stroke:'#162035' }),
-                      React.createElement(XAxis, { dataKey:'year', tick:{ fill:'#4b5563', fontSize:9 } }),
-                      React.createElement(YAxis, { domain:[710,760], tick:{ fill:'#4b5563', fontSize:9 } }),
-                      React.createElement(TT),
-                      React.createElement(ReferenceLine, { y:LR_MEAN, stroke:'#3b82f6', strokeDasharray:'4 4', label:{ value:'LR Mean 733', fill:'#3b82f6', fontSize:8 } }),
-                      ...[['ucd','#4a9eff'],['tcd','#f59e0b'],['rcsi','#ef4444'],['ucc','#10b981'],['nuig','#a78bfa']].map(([k,c]) =>
-                        React.createElement(Line, { key:k, type:'monotone', dataKey:k, stroke:c, strokeWidth:1.2, dot:false, name:k.toUpperCase() })
-                      ),
-                      React.createElement(Line, { type:'monotone', dataKey:'avg', stroke:'#fff', strokeWidth:2.5, dot:{ fill:'#fff', r:3 }, name:'5-Sch Avg' }),
-                    )
-                  ),
-                  React.createElement('div', { style:{ display:'flex', gap:12, marginTop:8, flexWrap:'wrap' } },
-                    [['UCD','#4a9eff'],['TCD','#f59e0b'],['RCSI','#ef4444'],['UCC','#10b981'],['NUIG','#a78bfa'],['Avg','#fff']].map(([l,c]) =>
-                      React.createElement('div', { key:l, style:{ display:'flex', alignItems:'center', gap:4 } },
-                        React.createElement('div', { style:{ width:12, height:2, background:c } }),
-                        React.createElement('span', { style:{ fontSize:9, color:'#4b5563' } }, l),
-                      )
-                    )
-                  ),
-                ]
-              ),
-              card(
-                [
-                  secLabel('2026 SCENARIO PROJECTIONS'),
-                  ...sc.map((s,i) =>
-                    React.createElement('div', {
-                      key:i, onClick:() => setUi(i),
-                      style:{ marginBottom:10, padding:10, cursor:'pointer',
-                              background: i===ui ? s.color+'0d' : 'transparent',
-                              border:`1px solid ${i===ui ? s.color : '#162035'}`,
-                              borderLeft:`3px solid ${s.color}`, borderRadius:4 }
-                    },
-                      React.createElement('div', { style:{ display:'flex', justifyContent:'space-between', marginBottom:5 } },
-                        React.createElement('span', { style:{ fontSize:10, fontWeight:700, color:s.color } }, s.label+' ('+s.sub+')'),
-                        React.createElement('span', { style:{ fontSize:10, fontWeight:700, color: s.p>0.5?'#ef4444':'#10b981' } }, 'P='+Math.round(s.p*100)+'%'),
-                      ),
-                      React.createElement('div', { style:{ display:'flex', gap:14 } },
-                        [['Proj',s.proj.toFixed(1)],['Δ',(s.mr>=0?'+':'')+s.mr.toFixed(1)],['Net',(s.net*100).toFixed(1)+'%']].map(([l,v]) =>
-                          React.createElement('div', { key:l },
-                            React.createElement('div', { style:{ fontSize:7, color:'#4b5563' } }, l),
-                            React.createElement('div', { style:{ fontSize:13, fontWeight:700, color:'#fff' } }, v),
-                          )
-                        )
-                      ),
-                    )
-                  ),
-                  React.createElement('div', { style:{ padding:10, background:'#060b16', borderRadius:6, border:'1px solid #162035' } },
-                    React.createElement('div', { style:{ fontSize:8, color:'#4b5563', letterSpacing:2, marginBottom:4 } }, 'OU MEAN REVERSION'),
-                    React.createElement('div', { style:{ fontSize:10, color:'#6b7280' } },
-                      'Dev from LR mean: ',
-                      React.createElement('span', { style:{ color: CUR_DEV<0?'#10b981':'#ef4444' } }, CUR_DEV.toFixed(1)+' pts'),
-                      ' · θ=0.35 · Adj: ',
-                      React.createElement('span', { style:{ color:'#f59e0b' } }, (-0.35*CUR_DEV).toFixed(1)+' pts'),
-                    ),
-                  ),
-                ]
-              ),
-            ),
-          ),
+function drawDemChart(newApp){
+  const c=document.getElementById('demChart');
+  if(!c)return;
+  const data=[...HISTORY.map(h=>({year:h.year,v:h.app})),{year:2026,v:newApp}];
+  const W=c.offsetWidth||c.parentElement.offsetWidth;
+  c.width=W; c.height=180;
+  const ctx=c.getContext('2d');
+  const pad={t:10,r:10,b:28,l:45};
+  const iw=W-pad.l-pad.r,ih=180-pad.t-pad.b;
+  const maxV=Math.max(...data.map(d=>d.v))*1.1;
+  const bw=iw/data.length*0.7;
+  ctx.clearRect(0,0,W,180);
+  data.forEach((d,i)=>{
+    const x=pad.l+i/data.length*iw+iw/data.length*0.15;
+    const h=d.v/maxV*ih;
+    ctx.fillStyle=d.year===2026?'#3b82f680':'#3b82f6';
+    ctx.beginPath();
+    ctx.roundRect(x,pad.t+ih-h,bw,h,3);
+    ctx.fill();
+    ctx.fillStyle='#4b5563'; ctx.font='9px monospace'; ctx.textAlign='center';
+    ctx.fillText(d.year,x+bw/2,180-pad.b+14);
+  });
+  ctx.fillStyle='#4b5563'; ctx.font='9px monospace'; ctx.textAlign='right';
+  [1000,2000,3000].forEach(v=>{ if(v<=maxV){ ctx.fillText(v,pad.l-4,pad.t+ih-v/maxV*ih+3); }});
+}
 
-          /* HISTORICAL */
-          tab === 'historical' && React.createElement('div', null,
-            React.createElement('div', { style:{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:12 } },
-              card([
-                secLabel('HPAT APPLICANT DEMAND (2017–2026 PROJ.)'),
-                React.createElement(ResponsiveContainer, { width:'100%', height:200 },
-                  React.createElement(BarChart, { data:demChart },
-                    React.createElement(CartesianGrid, { strokeDasharray:'3 3', stroke:'#162035' }),
-                    React.createElement(XAxis, { dataKey:'year', tick:{ fill:'#4b5563', fontSize:9 } }),
-                    React.createElement(YAxis, { tick:{ fill:'#4b5563', fontSize:9 } }),
-                    React.createElement(TT),
-                    React.createElement(Bar, { dataKey:'v', name:'Applicants', fill:'#3b82f6', radius:[3,3,0,0] }),
-                  )
-                ),
-              ]),
-              card([
-                secLabel('YOY POINTS CHANGE — 5-SCHOOL AVERAGE'),
-                React.createElement(ResponsiveContainer, { width:'100%', height:200 },
-                  React.createElement(BarChart, { data:deltaChart },
-                    React.createElement(CartesianGrid, { strokeDasharray:'3 3', stroke:'#162035' }),
-                    React.createElement(XAxis, { dataKey:'year', tick:{ fill:'#4b5563', fontSize:9 } }),
-                    React.createElement(YAxis, { tick:{ fill:'#4b5563', fontSize:9 } }),
-                    React.createElement(ReferenceLine, { y:0, stroke:'#3b82f6' }),
-                    React.createElement(TT),
-                    React.createElement(Bar, { dataKey:'delta', name:'Δ Avg Pts', fill:'#f59e0b', radius:[3,3,0,0] }),
-                  )
-                ),
-              ]),
-            ),
-            card([
-              secLabel('RAW DATA — MINIMUM COMBINED POINTS BY INSTITUTION'),
-              React.createElement('div', { style:{ overflowX:'auto' } },
-                React.createElement('table', { style:{ width:'100%', borderCollapse:'collapse', fontSize:11 } },
-                  React.createElement('thead', null,
-                    React.createElement('tr', { style:{ borderBottom:'1px solid #162035' } },
-                      ['Year','UCD','TCD','RCSI','UCC','NUIG','Avg','YoY Δ','Notes'].map(h =>
-                        React.createElement('th', { key:h, style:{ textAlign:'left', padding:'6px 8px', color:'#3b82f6', fontSize:8, letterSpacing:1 } }, h)
-                      )
-                    )
-                  ),
-                  React.createElement('tbody', null,
-                    HISTORY.map((h,i) => {
-                      const delta = i>0 ? h.avg - HISTORY[i-1].avg : null;
-                      return React.createElement('tr', { key:h.year, style:{ borderBottom:'1px solid #0d1829', background: h.note?'#0d160d40':'transparent' } },
-                        React.createElement('td', { style:{ padding:'5px 8px', fontWeight:700, color:'#fff' } }, h.year),
-                        ...[h.ucd,h.tcd,h.rcsi,h.ucc,h.nuig].map((v,j) =>
-                          React.createElement('td', { key:j, style:{ padding:'5px 8px', color:'#94a3b8' } }, v)
-                        ),
-                        React.createElement('td', { style:{ padding:'5px 8px', color:'#f59e0b', fontWeight:700 } }, h.avg),
-                        React.createElement('td', { style:{ padding:'5px 8px', fontWeight:700, color: delta===null?'#4b5563': delta>0?'#ef4444':'#10b981' } },
-                          delta===null ? '—' : (delta>0?'+':'')+delta.toFixed(1)
-                        ),
-                        React.createElement('td', { style:{ padding:'5px 8px', color:'#374151', fontSize:9 } }, h.note||'—'),
-                      );
-                    })
-                  ),
-                )
-              ),
-            ]),
-          ),
+function drawDeltaChart(){
+  const c=document.getElementById('deltaChart');
+  if(!c)return;
+  const data=HISTORY.slice(1).map((h,i)=>({year:h.year,v:+(h.avg-HISTORY[i].avg).toFixed(1)}));
+  const W=c.offsetWidth||c.parentElement.offsetWidth;
+  c.width=W; c.height=180;
+  const ctx=c.getContext('2d');
+  const pad={t:10,r:10,b:28,l:40};
+  const iw=W-pad.l-pad.r,ih=180-pad.t-pad.b;
+  const maxV=Math.max(...data.map(d=>Math.abs(d.v)))*1.3||5;
+  const zero=pad.t+ih/2;
+  const bw=iw/data.length*0.7;
+  ctx.clearRect(0,0,W,180);
+  ctx.strokeStyle='#3b82f6'; ctx.lineWidth=0.5;
+  ctx.beginPath();ctx.moveTo(pad.l,zero);ctx.lineTo(pad.l+iw,zero);ctx.stroke();
+  data.forEach((d,i)=>{
+    const x=pad.l+i/data.length*iw+iw/data.length*0.15;
+    const h=Math.abs(d.v)/maxV*(ih/2);
+    ctx.fillStyle=d.v>0?'#ef4444':'#10b981';
+    if(d.v>0){ ctx.beginPath();ctx.roundRect(x,zero-h,bw,h,3);ctx.fill(); }
+    else{ ctx.beginPath();ctx.roundRect(x,zero,bw,h,3);ctx.fill(); }
+    ctx.fillStyle='#4b5563'; ctx.font='9px monospace'; ctx.textAlign='center';
+    ctx.fillText(d.year,x+bw/2,180-pad.b+14);
+  });
+}
 
-          /* SCENARIOS */
-          tab === 'scenarios' && React.createElement('div', null,
-            React.createElement('div', { style:{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12, marginBottom:12 } },
-              sc.map((s,i) =>
-                React.createElement('div', { key:i, style:{ background:'#0a1020', border:'1px solid '+s.color, borderRadius:8, padding:18 } },
-                  React.createElement('div', { style:{ fontSize:9, letterSpacing:3, color:s.color, marginBottom:12 } }, s.label.toUpperCase()+' — '+s.sub),
-                  React.createElement('div', { style:{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:14 } },
-                    [
-                      ['UL Places', s.places],
-                      ['Total Supply', TOTAL_PLACES+s.places],
-                      ['Supply Relief', (s.relief*100).toFixed(1)+'%'],
-                      ['Net Pressure', (s.net*100).toFixed(1)+'%'],
-                      ['Raw Δ Pts', (s.raw>=0?'+':'')+s.raw.toFixed(1)],
-                      ['MR Adj', (-0.35*CUR_DEV).toFixed(1)],
-                      ['Final Δ', (s.mr>=0?'+':'')+s.mr.toFixed(1)],
-                      ['Projected', s.proj.toFixed(1)],
-                    ].map(([l,v]) =>
-                      React.createElement('div', { key:l, style:{ padding:'7px 8px', background:'#060b16', borderRadius:4 } },
-                        React.createElement('div', { style:{ fontSize:7, color:'#4b5563', letterSpacing:1, marginBottom:2 } }, l),
-                        React.createElement('div', { style:{ fontSize:14, fontWeight:700, color:'#fff' } }, v),
-                      )
-                    )
-                  ),
-                  React.createElement('div', { style:{ padding:12, background:s.color+'12', borderRadius:6, textAlign:'center' } },
-                    React.createElement('div', { style:{ fontSize:8, letterSpacing:2, color:s.color, marginBottom:2 } }, 'P(POINTS RISE)'),
-                    React.createElement('div', { style:{ fontSize:34, fontWeight:700, color:s.color } }, Math.round(s.p*100)+'%'),
-                    React.createElement('div', { style:{ fontSize:9, color:'#4b5563', marginTop:2 } },
-                      s.p>0.65 ? '▲ Rise likely' : s.p>0.45 ? '→ Marginal' : '▼ Fall possible'
-                    ),
-                  ),
-                )
-              )
-            ),
-            card([
-              secLabel('METHODOLOGY'),
-              ...[
-                ['Demand Model', '+'+Math.round(d*100)+'% applied to 2025 baseline 2,420 HPAT applicants → '+newApp.toLocaleString()+' projected'],
-                ['Supply Relief', 'UL places as % of current national total (483). Linear offset applied to demand pressure.'],
-                ['Points Sensitivity', '~1.8 combined pts per 1% net pressure. Calibrated from 2017–2020 + 2022–2025 regression. COVID 2021 excluded as structural outlier.'],
-                ['Mean Reversion (OU)', 'Ornstein-Uhlenbeck θ=0.35. Current deviation from LR mean (733): '+CUR_DEV.toFixed(1)+' pts. Reversion adds '+(-0.35*CUR_DEV).toFixed(1)+' pts to raw estimate.'],
-                ['Likelihood Ratio', 'Logistic sigmoid P(rise)=1/(1+e^(−8×net)). Scale k=8 calibrated to observed 710–755 historical range.'],
-                ['COVID 2021 Note', '+16pt spike from accredited grades. Structural outlier — excluded from all regression and sensitivity estimates.'],
-              ].map(([t,desc]) =>
-                React.createElement('div', { key:t, style:{ display:'flex', gap:12, marginBottom:8 } },
-                  React.createElement('div', { style:{ minWidth:130, fontSize:10, fontWeight:700, color:'#f59e0b' } }, t),
-                  React.createElement('div', { style:{ fontSize:10, color:'#6b7280', lineHeight:1.6 } }, desc),
-                )
-              ),
-            ]),
-          ),
+function drawLikeChart(sc){
+  const c=document.getElementById('likeChart');
+  if(!c)return;
+  const W=c.offsetWidth||c.parentElement.offsetWidth;
+  c.width=W; c.height=180;
+  const ctx=c.getContext('2d');
+  const pad={t:10,r:10,b:10,l:100};
+  const iw=W-pad.l-pad.r,ih=180-pad.t-pad.b;
+  const bh=ih/sc.length*0.5;
+  ctx.clearRect(0,0,W,180);
+  ctx.strokeStyle='#3b82f6'; ctx.lineWidth=0.5; ctx.setLineDash([4,4]);
+  const x50=pad.l+iw*0.5;
+  ctx.beginPath();ctx.moveTo(x50,pad.t);ctx.lineTo(x50,pad.t+ih);ctx.stroke();
+  ctx.setLineDash([]);
+  sc.forEach((s,i)=>{
+    const y=pad.t+i/sc.length*ih+ih/sc.length*0.25;
+    const rw=iw*Math.round(s.p*100)/100;
+    const sw=iw*Math.round((1-s.p)*100)/100;
+    ctx.fillStyle='#ef4444'; ctx.beginPath();ctx.roundRect(pad.l,y,rw,bh,[0,3,3,0]);ctx.fill();
+    ctx.fillStyle='#10b981'; ctx.beginPath();ctx.roundRect(pad.l+rw,y,sw,bh,[3,0,0,3]);ctx.fill();
+    ctx.fillStyle='#94a3b8'; ctx.font='10px monospace'; ctx.textAlign='right';
+    ctx.fillText(s.label,pad.l-8,y+bh/2+4);
+    ctx.fillStyle='#fff'; ctx.font='9px monospace'; ctx.textAlign='center';
+    ctx.fillText(Math.round(s.p*100)+'%',pad.l+rw/2,y+bh/2+4);
+  });
+  ctx.fillStyle='#4b5563'; ctx.font='9px monospace'; ctx.textAlign='center';
+  [0,25,50,75,100].forEach(v=>ctx.fillText(v+'%',pad.l+iw*v/100,180));
+}
 
-          /* LIKELIHOOD */
-          tab === 'likelihood' && React.createElement('div', null,
-            React.createElement('div', { style:{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:12 } },
-              card([
-                secLabel('P(RISE) vs P(STABLE/FALL) BY SCENARIO'),
-                React.createElement(ResponsiveContainer, { width:'100%', height:200 },
-                  React.createElement(BarChart, { layout:'vertical', data: sc.map(s => ({ name:s.label, rise:Math.round(s.p*100), stable:Math.round((1-s.p)*100) })) },
-                    React.createElement(CartesianGrid, { strokeDasharray:'3 3', stroke:'#162035' }),
-                    React.createElement(XAxis, { type:'number', domain:[0,100], tick:{ fill:'#4b5563', fontSize:9 }, unit:'%' }),
-                    React.createElement(YAxis, { type:'category', dataKey:'name', tick:{ fill:'#94a3b8', fontSize:10 }, width:95 }),
-                    React.createElement(TT, { formatter: v => v+'%' }),
-                    React.createElement(ReferenceLine, { x:50, stroke:'#3b82f6', strokeDasharray:'4 4' }),
-                    React.createElement(Bar, { dataKey:'rise', fill:'#ef4444', name:'P(Rise)', radius:[0,3,3,0] }),
-                    React.createElement(Bar, { dataKey:'stable', fill:'#10b981', name:'P(Stable/Fall)', radius:[0,3,3,0] }),
-                  )
-                ),
-              ]),
-              card([
-                secLabel('SUPPLY/DEMAND COMPRESSION RATIO'),
-                React.createElement('div', { style:{ fontSize:10, color:'#4b5563', marginBottom:10 } }, 'Applicants per available place — higher = more pressure'),
-                ...[
-                  { label:'2025 Baseline', r:2420/TOTAL_PLACES, c:'#4b5563' },
-                  ...sc.map(s => ({ label:s.label, r:newApp/(TOTAL_PLACES+s.places), c:s.color })),
-                ].map(item =>
-                  React.createElement('div', { key:item.label, style:{ display:'flex', alignItems:'center', gap:8, marginBottom:10 } },
-                    React.createElement('span', { style:{ fontSize:10, color:'#94a3b8', minWidth:100 } }, item.label),
-                    React.createElement('div', { style:{ flex:1, background:'#162035', borderRadius:3, height:7 } },
-                      React.createElement('div', { style:{ width:Math.min(item.r/8*100,100)+'%', background:item.c, height:'100%', borderRadius:3 } })
-                    ),
-                    React.createElement('span', { style:{ fontSize:12, fontWeight:700, color:item.c, minWidth:36 } }, item.r.toFixed(2)+'x'),
-                  )
-                ),
-                React.createElement('div', { style:{ padding:10, background:'#060b16', borderRadius:6, border:'1px solid #162035', marginTop:10 } },
-                  React.createElement('div', { style:{ fontSize:8, color:'#4b5563', letterSpacing:2, marginBottom:6 } }, 'VERDICT MATRIX'),
-                  ...sc.map((s,i) =>
-                    React.createElement('div', { key:i, style:{ display:'flex', justifyContent:'space-between', padding:'4px 0', borderBottom:'1px solid #0d1829' } },
-                      React.createElement('span', { style:{ fontSize:10, color:s.color } }, s.label),
-                      React.createElement('span', { style:{ fontSize:10, fontWeight:700, color: s.mr>1?'#ef4444':s.mr>-1?'#f59e0b':'#10b981' } },
-                        s.mr>1 ? '▲ RISE LIKELY' : s.mr>-1 ? '→ FLAT / MARGINAL' : '▼ FALL POSSIBLE'
-                      ),
-                    )
-                  ),
-                ),
-              ]),
-            ),
-            card([
-              secLabel('OUTLIER ANALYSIS — BOUNDARY CONDITIONS'),
-              React.createElement('div', { style:{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:10 } },
-                [
-                  { label:'Bull',    desc:'+30% demand / 30 pl', d2:0.30, u2:30, c:'#ef4444' },
-                  { label:'Base',    desc:'+20% demand / 50 pl', d2:0.20, u2:50, c:'#3b82f6' },
-                  { label:'Bear',    desc:'+10% demand / 75 pl', d2:0.10, u2:75, c:'#10b981' },
-                  { label:'Outlier', desc:'+40% demand / 30 pl', d2:0.40, u2:30, c:'#a78bfa' },
-                ].map(o => {
-                  const m = calc(o.d2, o.u2);
-                  return React.createElement('div', { key:o.label, style:{ padding:12, border:'1px solid '+o.c, borderRadius:6, background:o.c+'07' } },
-                    React.createElement('div', { style:{ fontWeight:700, color:o.c, fontSize:11, marginBottom:2 } }, o.label),
-                    React.createElement('div', { style:{ fontSize:9, color:'#4b5563', marginBottom:8 } }, o.desc),
-                    ...[
-                      ['Net Pressure', (m.net*100).toFixed(1)+'%'],
-                      ['Raw Δ Pts', (m.raw>=0?'+':'')+m.raw.toFixed(1)],
-                      ['MR Δ Pts', (m.mr>=0?'+':'')+m.mr.toFixed(1)],
-                      ['Projected', m.proj.toFixed(1)],
-                      ['P(Rise)', Math.round(m.p*100)+'%'],
-                    ].map(([l,v]) =>
-                      React.createElement('div', { key:l, style:{ display:'flex', justifyContent:'space-between', fontSize:10, padding:'2px 0', borderBottom:'1px solid #0d1829' } },
-                        React.createElement('span', { style:{ color:'#4b5563' } }, l),
-                        React.createElement('span', { style:{ color:'#fff', fontWeight:700 } }, v),
-                      )
-                    ),
-                  );
-                })
-              ),
-            ]),
-          ),
-        ),
-      );
-    }
+function setState(patch){
+  state={...state,...patch};
+  render();
+}
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(React.createElement(App));
-  </script>
-</body>
-</html>
-    root.render(React.createElement(App));
-  </script>
+render();
+</script>
 </body>
 </html>
